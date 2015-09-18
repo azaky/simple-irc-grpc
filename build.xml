@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="simple-irc-grpc" default="all">
+  
+  
+  <property file="build.properties"/>
+  <!-- Uncomment the following property if no tests compilation is needed -->
+  <!-- 
+  <property name="skip.tests" value="true"/>
+   -->
+  
+  <!-- Compiler options -->
+  
+  <property name="compiler.debug" value="on"/>
+  <property name="compiler.generate.no.warnings" value="off"/>
+  <property name="compiler.args" value=""/>
+  <property name="compiler.max.memory" value="700m"/>
+  <patternset id="ignored.files">
+    <exclude name="**/*.hprof/**"/>
+    <exclude name="**/*.pyc/**"/>
+    <exclude name="**/*.pyo/**"/>
+    <exclude name="**/*.rbc/**"/>
+    <exclude name="**/*~/**"/>
+    <exclude name="**/.DS_Store/**"/>
+    <exclude name="**/.bundle/**"/>
+    <exclude name="**/.git/**"/>
+    <exclude name="**/.hg/**"/>
+    <exclude name="**/.svn/**"/>
+    <exclude name="**/.tox/**"/>
+    <exclude name="**/CVS/**"/>
+    <exclude name="**/RCS/**"/>
+    <exclude name="**/SCCS/**"/>
+    <exclude name="**/__pycache__/**"/>
+    <exclude name="**/_svn/**"/>
+    <exclude name="**/rcs/**"/>
+    <exclude name="**/vssver.scc/**"/>
+    <exclude name="**/vssver2.scc/**"/>
+  </patternset>
+  <patternset id="library.patterns">
+    <include name="*.war"/>
+    <include name="*.ear"/>
+    <include name="*.apk"/>
+    <include name="*.zip"/>
+    <include name="*.swc"/>
+    <include name="*.ane"/>
+    <include name="*.egg"/>
+    <include name="*.jar"/>
+  </patternset>
+  <patternset id="compiler.resources">
+    <exclude name="**/?*.java"/>
+    <exclude name="**/?*.form"/>
+    <exclude name="**/?*.class"/>
+    <exclude name="**/?*.groovy"/>
+    <exclude name="**/?*.scala"/>
+    <exclude name="**/?*.flex"/>
+    <exclude name="**/?*.kt"/>
+    <exclude name="**/?*.clj"/>
+    <exclude name="**/?*.aj"/>
+  </patternset>
+  
+  <!-- JDK definitions -->
+  
+  <property name="jdk.bin.1.8" value="${jdk.home.1.8}/bin"/>
+  <path id="jdk.classpath.1.8">
+    <fileset dir="${jdk.home.1.8}">
+      <include name="jre/lib/jfr.jar"/>
+      <include name="jre/lib/charsets.jar"/>
+      <include name="jre/lib/resources.jar"/>
+      <include name="jre/lib/javaws.jar"/>
+      <include name="jre/lib/jsse.jar"/>
+      <include name="jre/lib/rt.jar"/>
+      <include name="jre/lib/management-agent.jar"/>
+      <include name="jre/lib/jfxswt.jar"/>
+      <include name="jre/lib/jce.jar"/>
+      <include name="jre/lib/plugin.jar"/>
+      <include name="jre/lib/deploy.jar"/>
+      <include name="jre/lib/ext/sunjce_provider.jar"/>
+      <include name="jre/lib/ext/localedata.jar"/>
+      <include name="jre/lib/ext/sunec.jar"/>
+      <include name="jre/lib/ext/zipfs.jar"/>
+      <include name="jre/lib/ext/dnsns.jar"/>
+      <include name="jre/lib/ext/jfxrt.jar"/>
+      <include name="jre/lib/ext/nashorn.jar"/>
+      <include name="jre/lib/ext/jaccess.jar"/>
+      <include name="jre/lib/ext/sunpkcs11.jar"/>
+      <include name="jre/lib/ext/cldrdata.jar"/>
+    </fileset>
+  </path>
+  
+  <property name="project.jdk.home" value="${jdk.home.1.8}"/>
+  <property name="project.jdk.bin" value="${jdk.bin.1.8}"/>
+  <property name="project.jdk.classpath" value="jdk.classpath.1.8"/>
+  
+  <!-- Modules -->
+  
+  
+  <!-- Module simple-irc-grpc -->
+  
+  <dirname property="module.simple-irc-grpc.basedir" file="${ant.file}"/>
+  
+  
+  <property name="module.jdk.home.simple-irc-grpc" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.simple-irc-grpc" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.simple-irc-grpc" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.simple-irc-grpc" value="-encoding UTF-8 -source 8 ${compiler.args}"/>
+  
+  <property name="simple-irc-grpc.output.dir" value="${module.simple-irc-grpc.basedir}/out/production/simple-irc-grpc"/>
+  <property name="simple-irc-grpc.testoutput.dir" value="${module.simple-irc-grpc.basedir}/out/test/simple-irc-grpc"/>
+  
+  <path id="simple-irc-grpc.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="simple-irc-grpc.module.production.classpath">
+    <path refid="${module.jdk.classpath.simple-irc-grpc}"/>
+    <fileset dir="${basedir}/lib">
+      <patternset refid="library.patterns"/>
+    </fileset>
+  </path>
+  
+  <path id="simple-irc-grpc.runtime.production.module.classpath">
+    <pathelement location="${simple-irc-grpc.output.dir}"/>
+    <fileset dir="${basedir}/lib">
+      <patternset refid="library.patterns"/>
+    </fileset>
+  </path>
+  
+  <path id="simple-irc-grpc.module.classpath">
+    <path refid="${module.jdk.classpath.simple-irc-grpc}"/>
+    <pathelement location="${simple-irc-grpc.output.dir}"/>
+    <fileset dir="${basedir}/lib">
+      <patternset refid="library.patterns"/>
+    </fileset>
+  </path>
+  
+  <path id="simple-irc-grpc.runtime.module.classpath">
+    <pathelement location="${simple-irc-grpc.testoutput.dir}"/>
+    <pathelement location="${simple-irc-grpc.output.dir}"/>
+    <fileset dir="${basedir}/lib">
+      <patternset refid="library.patterns"/>
+    </fileset>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.simple-irc-grpc">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.simple-irc-grpc">
+    <patternset refid="excluded.from.module.simple-irc-grpc"/>
+  </patternset>
+  
+  <path id="simple-irc-grpc.module.sourcepath">
+    <dirset dir="${module.simple-irc-grpc.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.simple-irc-grpc" depends="compile.module.simple-irc-grpc.production,compile.module.simple-irc-grpc.tests" description="Compile module simple-irc-grpc"/>
+  
+  <target name="compile.module.simple-irc-grpc.production" description="Compile module simple-irc-grpc; production classes">
+    <mkdir dir="${simple-irc-grpc.output.dir}"/>
+    <javac destdir="${simple-irc-grpc.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.simple-irc-grpc}/javac">
+      <compilerarg line="${compiler.args.simple-irc-grpc}"/>
+      <bootclasspath refid="simple-irc-grpc.module.bootclasspath"/>
+      <classpath refid="simple-irc-grpc.module.production.classpath"/>
+      <src refid="simple-irc-grpc.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.simple-irc-grpc"/>
+    </javac>
+    
+    <copy todir="${simple-irc-grpc.output.dir}">
+      <fileset dir="${module.simple-irc-grpc.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.simple-irc-grpc.tests" depends="compile.module.simple-irc-grpc.production" description="compile module simple-irc-grpc; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.simple-irc-grpc" description="cleanup module">
+    <delete dir="${simple-irc-grpc.output.dir}"/>
+    <delete dir="${simple-irc-grpc.testoutput.dir}"/>
+  </target>
+  
+  <target name="init" description="Build initialization">
+    <!-- Perform any build initialization in this target -->
+  </target>
+  
+  <target name="clean" depends="clean.module.simple-irc-grpc" description="cleanup all"/>
+  
+  <target name="build.modules" depends="init, clean, compile.module.simple-irc-grpc" description="build all modules"/>
+  
+  <target name="init.artifacts">
+    <property name="artifacts.temp.dir" value="${basedir}/__artifacts_temp"/>
+    <property name="artifact.output.simple-irc-grpc-client:jar" value="${basedir}/out/artifacts/simple_irc_grpc_client_jar"/>
+    <property name="artifact.output.simple-irc-grpc-server:jar" value="${basedir}/out/artifacts/simple_irc_grpc_server_jar"/>
+    <mkdir dir="${artifacts.temp.dir}"/>
+    <property name="temp.jar.path.simple-irc-grpc-client.jar" value="${artifacts.temp.dir}/simple-irc-grpc-client.jar"/>
+    <property name="temp.jar.path.simple-irc-grpc-server.jar" value="${artifacts.temp.dir}/simple-irc-grpc-server.jar"/>
+  </target>
+  
+  <target name="artifact.simple-irc-grpc-client:jar" depends="init.artifacts, compile.module.simple-irc-grpc" description="Build &#39;simple-irc-grpc-client:jar&#39; artifact">
+    <property name="artifact.temp.output.simple-irc-grpc-client:jar" value="${artifacts.temp.dir}/simple_irc_grpc_client_jar"/>
+    <mkdir dir="${artifact.temp.output.simple-irc-grpc-client:jar}"/>
+    <jar destfile="${temp.jar.path.simple-irc-grpc-client.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
+      <zipfileset file="${basedir}/manifest/client/META-INF/MANIFEST.MF" prefix="META-INF"/>
+      <zipfileset dir="${simple-irc-grpc.output.dir}"/>
+      <zipfileset src="${basedir}/lib/hpack-0.11.0.jar"/>
+      <zipfileset src="${basedir}/lib/grpc-all-0.8.0.jar"/>
+      <zipfileset src="${basedir}/lib/guava-19.0-rc2.jar"/>
+      <zipfileset src="${basedir}/lib/commons-lang3-3.4.jar"/>
+      <zipfileset src="${basedir}/lib/netty-all-4.1.0.Beta5.jar"/>
+      <zipfileset src="${basedir}/lib/protobuf-java-3.0.0-beta-1.jar"/>
+    </jar>
+    <copy file="${temp.jar.path.simple-irc-grpc-client.jar}" tofile="${artifact.temp.output.simple-irc-grpc-client:jar}/simple-irc-grpc-client.jar"/>
+  </target>
+  
+  <target name="artifact.simple-irc-grpc-server:jar" depends="init.artifacts, compile.module.simple-irc-grpc" description="Build &#39;simple-irc-grpc-server:jar&#39; artifact">
+    <property name="artifact.temp.output.simple-irc-grpc-server:jar" value="${artifacts.temp.dir}/simple_irc_grpc_server_jar"/>
+    <mkdir dir="${artifact.temp.output.simple-irc-grpc-server:jar}"/>
+    <jar destfile="${temp.jar.path.simple-irc-grpc-server.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
+      <zipfileset file="${basedir}/manifest/server/META-INF/MANIFEST.MF" prefix="META-INF"/>
+      <zipfileset dir="${simple-irc-grpc.output.dir}"/>
+      <zipfileset src="${basedir}/lib/hpack-0.11.0.jar"/>
+      <zipfileset src="${basedir}/lib/grpc-all-0.8.0.jar"/>
+      <zipfileset src="${basedir}/lib/guava-19.0-rc2.jar"/>
+      <zipfileset src="${basedir}/lib/commons-lang3-3.4.jar"/>
+      <zipfileset src="${basedir}/lib/netty-all-4.1.0.Beta5.jar"/>
+      <zipfileset src="${basedir}/lib/protobuf-java-3.0.0-beta-1.jar"/>
+    </jar>
+    <copy file="${temp.jar.path.simple-irc-grpc-server.jar}" tofile="${artifact.temp.output.simple-irc-grpc-server:jar}/simple-irc-grpc-server.jar"/>
+  </target>
+  
+  <target name="build.all.artifacts" depends="artifact.simple-irc-grpc-client:jar, artifact.simple-irc-grpc-server:jar" description="Build all artifacts">
+    <mkdir dir="${artifact.output.simple-irc-grpc-client:jar}"/>
+    <copy todir="${artifact.output.simple-irc-grpc-client:jar}">
+      <fileset dir="${artifact.temp.output.simple-irc-grpc-client:jar}"/>
+    </copy>
+    <mkdir dir="${artifact.output.simple-irc-grpc-server:jar}"/>
+    <copy todir="${artifact.output.simple-irc-grpc-server:jar}">
+      <fileset dir="${artifact.temp.output.simple-irc-grpc-server:jar}"/>
+    </copy>
+    
+    <!-- Delete temporary files -->
+    <delete dir="${artifacts.temp.dir}"/>
+  </target>
+  
+  <target name="all" depends="build.modules, build.all.artifacts" description="build all"/>
+</project>
