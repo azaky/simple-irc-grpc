@@ -1,7 +1,5 @@
 package com.server;
 
-import org.apache.thrift.TException;
-
 import java.util.HashMap;
 
 /**
@@ -24,7 +22,7 @@ public class UserServer {
         m_nicknameUserMapper.put(nickname, user);
     }
 
-    public void changeNickname(String newNickname, User user) throws TException {
+    public void changeNickname(String newNickname, User user) {
         m_nicknameUserMapper.remove(user.getNickname());
         m_nicknameUserMapper.put(newNickname, user);
     }
@@ -33,7 +31,7 @@ public class UserServer {
         return !m_nicknameUserMapper.containsKey(nickname);
     }
 
-    public void removeUser(User user) throws TException {
+    public void removeUser(User user) {
         m_nicknameUserMapper.remove(user.getNickname());
     }
 }

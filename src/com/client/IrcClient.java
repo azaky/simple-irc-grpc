@@ -1,16 +1,15 @@
 package com.client;
 
-import if4031.UserService;
-import org.apache.thrift.TException;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.apache.thrift.protocol.TProtocol;
-import org.apache.thrift.transport.TSocket;
-import org.apache.thrift.transport.TTransport;
+import if4031.Interface;
+import if4031.Interface.*;
+import if4031.UserServiceGrpc;
+import if4031.UserServiceGrpc.UserServiceBlockingStub;
+import if4031.UserServiceGrpc.UserServiceStub;
+import io.grpc.ChannelImpl;
+import io.grpc.netty.NegotiationType;
+import io.grpc.netty.NettyChannelBuilder;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class IrcClient {
@@ -19,34 +18,26 @@ public class IrcClient {
     public static final int DEFAULT_PORT = 9090;
     private static final long POLLING_PERIOD = 3000;
 
-    private final UserService.Client client;
-    private final TTransport transport;
+    private final ChannelImpl channel;
+    private final UserServiceBlockingStub blockingStub;
+    private final UserServiceStub asyncStub;
     private final String token;
     private final AtomicBoolean isTerminated = new AtomicBoolean(false);
     private final Set<String> channels = new HashSet<>();
     private String nickname;
 
-    public IrcClient(UserService.Client client, TTransport transport) {
-        this.client = client;
-        this.transport = transport;
-        try {
-            this.token = client.getToken();
-            this.nickname = client.getNickname(token);
-        } catch (TException e) {
-            throw new RuntimeException("Unable to create ClientLauncher", e);
-        }
+    public IrcClient(ChannelImpl channel) {
+        this.channel = channel;
+        this.blockingStub = UserServiceGrpc.newBlockingStub(channel);
+        this.asyncStub = UserServiceGrpc.newStub(channel);
+        this.token = blockingStub.getToken(Interface.GrpcVoid.newBuilder().build()).getToken();
     }
 
     public static IrcClient create(String host, int port) {
-        try {
-            TTransport transport = new TSocket(host, port);
-            transport.open();
-            TProtocol protocol = new TBinaryProtocol(transport);
-            UserService.Client client = new UserService.Client(protocol);
-            return new IrcClient(client, transport);
-        } catch (TException e) {
-            throw new RuntimeException("Unable to create ClientLauncher", e);
-        }
+        ChannelImpl channel = NettyChannelBuilder.forAddress(host, port)
+                .negotiationType(NegotiationType.PLAINTEXT)
+                .build();
+        return new IrcClient(channel);
     }
 
     public static IrcClient create() {
@@ -64,7 +55,7 @@ public class IrcClient {
         } catch (InterruptedException e) {
             throw new IllegalStateException(e);
         } finally {
-            transport.close();
+            channel.shutdown();
         }
     }
 
@@ -74,15 +65,10 @@ public class IrcClient {
             public void run() {
                 try {
                     while (!isTerminated.get()) {
-                        try {
-                            List<String> messages = client.getMessage(token);
-                            for (String message : messages) {
-                                showMessage(message);
-                            }
-                        } catch (TException e) {
-                            showMessage("ERROR: Something happens when trying to fetch message: " + e.getMessage());
-                            showMessage("       Please press <Enter> to terminate ...");
-                            terminate();
+                        Iterator<GrpcString> messages = blockingStub.getMessage(
+                                Token.newBuilder().setToken(token).build());
+                        while (messages.hasNext()) {
+                            showMessage(messages.next().getValue());
                         }
                         Thread.sleep(POLLING_PERIOD);
                     }
@@ -116,51 +102,68 @@ public class IrcClient {
 
     private void handleInput(String input) {
         List<String> groups;
-        try {
-            if ((groups = CommandRegexes.NICK.match(input)) != null) {
-                nickname = groups.get(0);
-                if (nickname == null) {
-                    nickname = client.getNickname(token);
-                } else {
-                    if (!client.setNickname(token, nickname)) {
-                        showMessage("ERROR: nickname " + nickname + " has already taken");
-                        nickname = null;
-                    }
+        if ((groups = CommandRegexes.NICK.match(input)) != null) {
+            nickname = groups.get(0);
+            if (nickname == null) {
+                nickname = blockingStub.getNickname(Token.newBuilder().setToken(token).build()).getValue();
+            } else {
+                TokenedString request = TokenedString.newBuilder()
+                        .setToken(token)
+                        .setValue(nickname)
+                        .build();
+                if (!blockingStub.setNickname(request).getValue()) {
+                    showMessage("ERROR: nickname " + nickname + " has already taken");
+                    nickname = null;
                 }
-                if (nickname != null) {
-                    showMessage("Welcome " + nickname + "!");
-                }
-            } else if ((groups = CommandRegexes.JOIN.match(input)) != null) {
-                String channelName = groups.get(0);
-                if (channels.contains(channelName)) {
-                    showMessage("WARNING: You have already joined channel " + channelName);
-                } else {
-                    client.joinChannel(token, channelName);
-                    channels.add(channelName);
-                    showMessage("Joined channel " + channelName);
-                }
-            } else if ((groups = CommandRegexes.LEAVE.match(input)) != null) {
-                String channelName = groups.get(0);
-                if (channels.contains(channelName)) {
-                    client.leaveChannel(token, channelName);
-                    channels.remove(channelName);
-                    showMessage("Leaving channel " + channelName);
-                } else {
-                    showMessage("WARNING: You haven't joined channel " + channelName);
-                }
-            } else if (CommandRegexes.EXIT.match(input) != null) {
-                client.exit(token);
-                terminate();
-                showMessage("Bye bye!");
-            } else if ((groups = CommandRegexes.MESSAGE_CHANNEL.match(input)) != null) {
-                String channelName = groups.get(0);
-                String message = groups.get(1);
-                client.sendMessageToChannel(token, message, channelName);
-            } else { // Assuming broadcast
-                client.sendMessage(token, input);
             }
-        } catch (TException e) {
-            showMessage("ERROR: error while handling input: " + e.getMessage());
+            if (nickname != null) {
+                showMessage("Welcome " + nickname + "!");
+            }
+        } else if ((groups = CommandRegexes.JOIN.match(input)) != null) {
+            String channelName = groups.get(0);
+            if (channels.contains(channelName)) {
+                showMessage("WARNING: You have already joined channel " + channelName);
+            } else {
+                TokenedString request = TokenedString.newBuilder()
+                        .setToken(token)
+                        .setValue(channelName)
+                        .build();
+                blockingStub.joinChannel(request);
+                channels.add(channelName);
+                showMessage("Joined channel " + channelName);
+            }
+        } else if ((groups = CommandRegexes.LEAVE.match(input)) != null) {
+            String channelName = groups.get(0);
+            if (channels.contains(channelName)) {
+                TokenedString request = TokenedString.newBuilder()
+                        .setToken(token)
+                        .setValue(channelName)
+                        .build();
+                blockingStub.leaveChannel(request);
+                channels.remove(channelName);
+                showMessage("Leaving channel " + channelName);
+            } else {
+                showMessage("WARNING: You haven't joined channel " + channelName);
+            }
+        } else if (CommandRegexes.EXIT.match(input) != null) {
+            blockingStub.exit(Token.newBuilder().setToken(token).build());
+            terminate();
+            showMessage("Bye bye!");
+        } else if ((groups = CommandRegexes.MESSAGE_CHANNEL.match(input)) != null) {
+            String channelName = groups.get(0);
+            String message = groups.get(1);
+            TokenedMessageAndChannel request = TokenedMessageAndChannel.newBuilder()
+                    .setToken(token)
+                    .setMessage(message)
+                    .setChannel(channelName)
+                    .build();
+            blockingStub.sendMessageToChannel(request);
+        } else { // Assuming broadcast
+            TokenedString request = TokenedString.newBuilder()
+                    .setToken(token)
+                    .setValue(input)
+                    .build();
+            blockingStub.sendMessage(request);
         }
     }
 }

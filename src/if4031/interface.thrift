@@ -1,5 +1,7 @@
 namespace java if4031
 
+option java_outer_classname = "HelloWorldProto";
+
 service UserService {
 
 	// Get token

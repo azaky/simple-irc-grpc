@@ -1,32 +1,25 @@
 package com.server;
 
-import if4031.UserHandler;
-import if4031.UserService;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.apache.thrift.server.TServer;
-import org.apache.thrift.server.TSimpleServer;
-import org.apache.thrift.server.TThreadPoolServer;
-import org.apache.thrift.transport.TServerSocket;
-import org.apache.thrift.transport.TServerTransport;
+import if4031.UserServiceGrpc;
+import io.grpc.ServerImpl;
+import io.grpc.netty.NettyServerBuilder;
 
 public class Main {
 
-    public static void main(String[] args) {
-        UserHandler handler = new UserHandler();
-        UserService.Processor processor = new UserService.Processor(handler);
+    public static final int DEFAULT_PORT = 9090;
 
-        Runnable simple = () -> simple(processor);
+    public static void main(String[] args) {
+        Runnable simple = () -> simple();
         new Thread(simple).start();
     }
 
-    public static void simple(UserService.Processor processor) {
+    public static void simple() {
         try {
-            TServerTransport serverTransport = new TServerSocket(9090);
-            TServer server = new TThreadPoolServer(new TThreadPoolServer.Args(serverTransport).processor(processor)
-                    .protocolFactory(new TBinaryProtocol.Factory()));
-
-            System.out.println("Starting the simple server...");
-            server.serve();
+            ServerImpl gRpcServer = NettyServerBuilder.forPort(DEFAULT_PORT)
+                    .addService(UserServiceGrpc.bindService(new UserServiceHandler()))
+                    .build().start();
+            System.out.println("Server started on port " + DEFAULT_PORT);
+            gRpcServer.awaitTermination();
         } catch (Exception e) {
             e.printStackTrace();
         }

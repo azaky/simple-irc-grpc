@@ -13,7 +13,7 @@ public class ClientLauncher {
             IrcClient launcher = IrcClient.create(host, port);
             launcher.launch();
         } catch (Exception e) {
-            System.out.println("Something bad happened when trying to start client");
+            throw new RuntimeException("Something bad happened when trying to start client", e);
         }
     }
 

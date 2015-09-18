@@ -1,6 +1,5 @@
 package com.server;
 
-import org.apache.thrift.TException;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.HashSet;
@@ -25,11 +24,11 @@ public class User{
         userServer.addUser(m_nickname, this);
     }
 
-    public String getNickname() throws TException {
+    public String getNickname() {
         return m_nickname;
     }
 
-    public boolean setNickname(String nickname) throws TException {
+    public boolean setNickname(String nickname) {
         UserServer userServer = UserServer.getInstance();
         if (!userServer.checkNicknameAvailable(nickname)) {
             return false;
@@ -39,7 +38,7 @@ public class User{
         return true;
     }
 
-    public void joinChannel(String channelName) throws TException {
+    public void joinChannel(String channelName) {
         ChannelServer channelServer = ChannelServer.getInstance();
         Channel channel = channelServer.getChannel(channelName);
         channel.addUser(this);
@@ -47,7 +46,7 @@ public class User{
         m_channels.add(channel);
     }
 
-    public void leaveChannel(String channelName) throws TException {
+    public void leaveChannel(String channelName) {
         ChannelServer channelServer = ChannelServer.getInstance();
         Channel channel = channelServer.getChannel(channelName);
         channel.removeUser(this);
@@ -55,13 +54,13 @@ public class User{
         m_channels.remove(channel);
     }
 
-    public void sendMessage(String message) throws TException {
+    public void sendMessage(String message) {
         for (Channel channel : m_channels) {
             channel.sendMessage(m_nickname, message);
         }
     }
 
-    public void sendMessageToChannel(String message, String channelName) throws TException {
+    public void sendMessageToChannel(String message, String channelName) {
         ChannelServer channelServer = ChannelServer.getInstance();
         if (channelServer.checkChannelAvailable(channelName))
             return;
@@ -69,13 +68,13 @@ public class User{
         channel.sendMessage(m_nickname, message);
     }
 
-    public List<String> getMessage() throws TException {
+    public List<String> getMessage() {
         Vector<String> messages = m_messages;
         m_messages = new Vector<>();
         return messages;
     }
 
-    public void exit() throws TException {
+    public void exit() {
         for (Channel channel : m_channels) {
             channel.removeUser(this);
         }
