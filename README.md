@@ -8,9 +8,11 @@ This section is to help you guys get out from frustration of setting up Protobuf
 
 ### Protobuf Setup
 
+**You have to use the pre-release v3.0.0-alpha-3.1 in order to use Grpc along with Protobuf.** To verify it, make sure that the output of `protoc --version` is showing `libprotoc 3.0.0` after you install the protobuf.
+
 #### Windows Users
 
-Good news for Windows users, there is already a binary release for Windows. You can find it in [https://github.com/google/protobuf/releases](https://github.com/google/protobuf/releases). There are multiple releases there, but you must use the pre-release v3.0.0-alpha-3.1 in order to use Grpc along with Protobuf.
+Good news for Windows users, there is already a binary release for Windows. You can find it in [https://github.com/google/protobuf/releases](https://github.com/google/protobuf/releases). Remember to grab the v3.0.0-alpha-3.1.
 
 #### Linux Users
 
@@ -20,13 +22,19 @@ Clone the repository from github:
 
 	git clone https://github.com/google/protobuf.git
 
+Or you can grab it from [https://github.com/google/protobuf/releases](https://github.com/google/protobuf/releases).
+
 After this, internet connection will be required. I strongly suggest to use non-proxy connection to download the dependencies, as there will only be few MBs of required data.
 
 	cd protobuf
+	./autogen.sh
+	./configure
 	make
 	sudo make install
 
-You will find executable `protoc` inside the `src` directory. Verify everything works well by executing the following commands:
+Along the way, you may see some failing tasks, because you don't have the required tools (`autoreconf` and `libtoolize`). You can get it by running `sudo apt-get install autoreconf` and `sudo apt-get install libtoolize`.
+
+After this, you will find executable `protoc` inside the `src` directory. Verify everything works well by executing the following commands:
 
 	cd src
 	./protoc
@@ -34,7 +42,7 @@ You will find executable `protoc` inside the `src` directory. Verify everything 
 You will see `Missing input file`. If you want to use protoc from other directories, copy the executable and the libs by executing:
 
 	sudo cp protoc /usr/local/bin
-	sudo cp -avr .libs/ /urs/local/bin
+	sudo cp -avr .libs/ /usr/local/bin
 
 
 Again, to verify it, navigate to any other directory and run `protoc` (without `./`). You will see `Missing input file` if everything went well.
@@ -93,7 +101,7 @@ Now, to generate the java files, run the following command.
 
 	protoc --plugin=protoc-gen-grpc-java=location/to/protoc-gen-grpc-java --grpc-java_out=. --java_out=. hello_world.proto
 
-where `location/to/protoc-gen-grpc-java` is the location of build result above. You will see new files called `GreeterGrpc.java` and `HelloWorldProto.java` in folder `io/grpc/examples/helloworld`. `GreeterGrpc.java` contains the generated client stubs and server interfaces. `HelloWorldProto.java` contains the "Java version" of `HelloRequest` and `HelloResponse`.
+where `location/to/protoc-gen-grpc-java` is the location of build result above (by default, it is in `grpc-java-0.8.0/compiler/build/binaries/java_pluginExecutable/protoc-gen-grpc-java`. You will see new files called `GreeterGrpc.java` and `HelloWorldProto.java` in folder `io/grpc/examples/helloworld`. `GreeterGrpc.java` contains the generated client stubs and server interfaces. `HelloWorldProto.java` contains the "Java version" of `HelloRequest` and `HelloResponse`.
 
 ### Using the files in your project
 
