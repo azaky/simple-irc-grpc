@@ -103,6 +103,32 @@ Now, to generate the java files, run the following command.
 
 where `location/to/protoc-gen-grpc-java` is the location of build result above (by default, it is in `grpc-java-0.8.0/compiler/build/binaries/java_pluginExecutable/protoc-gen-grpc-java`. You will see new files called `GreeterGrpc.java` and `HelloWorldProto.java` in folder `io/grpc/examples/helloworld`. `GreeterGrpc.java` contains the generated client stubs and server interfaces. `HelloWorldProto.java` contains the "Java version" of `HelloRequest` and `HelloResponse`.
 
+### Getting errors?
+
+When you compile your own proto files, you may see errors like `expected messsage type` or similar. That is because all of data types in the service definition must be a message. It cannot have a primitive types like `string` or `int32`. Also, you must have exactly one message in input or output of each methods. For instance, all of the service definition below are not allowed.
+
+	service Service {
+	  rpc getSomething (int32) returns (string) {} // primitive types are not allowed
+	  rpc getSomethingElse (Message1, Message2) returns (Message3) {} // multiple inputs are not allowed
+	  rpc getSomethingElse () returns (Message) {} // no input is also not allowed
+	}
+
+An (ugly) workaround is to declare a message of required types like:
+
+	message MyInt32 {
+	  int32 value = 1;
+	}
+
+and use `MyInt32` as `int32` in your services.
+
+Luckily you can have a list of messages as input or output, by declaring `stream` in front of the message, like this
+
+	service Service {
+	  rpc getSomething (stream Message1) returns (stream Message2) {}
+	}
+
+For more information, refer to the official documentation [http://www.grpc.io/docs/tutorials/basic/java.html](http://www.grpc.io/docs/tutorials/basic/java.html) (for Java users).
+
 ### Using the files in your project
 
 Just import the java files to your project. Notice that those files won't compile because you are missing some dependencies. The required ones are:
