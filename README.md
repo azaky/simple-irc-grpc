@@ -8,11 +8,11 @@ This section is to help you guys get out from frustration of setting up Protobuf
 
 ### Protobuf Setup
 
-**You have to use the pre-release v3.0.0-alpha-3.1 in order to use Grpc along with Protobuf.** To verify it, make sure that the output of `protoc --version` is showing `libprotoc 3.0.0` after you install the protobuf.
+**You have to use the pre-release v3.0.0 (any of them, but the latest is recommended) in order to use Grpc along with Protobuf.** To verify it, make sure that the output of `protoc --version` is showing `libprotoc 3.0.0` after you install the protobuf.
 
 #### Windows Users
 
-Good news for Windows users, there is already a binary release for Windows. You can find it in [https://github.com/google/protobuf/releases](https://github.com/google/protobuf/releases). Remember to grab the v3.0.0-alpha-3.1.
+Good news for Windows users, there is already a binary release for Windows. You can find it in [https://github.com/google/protobuf/releases](https://github.com/google/protobuf/releases). Remember to grab the v3.0.0 (mine was v3.0.0-beta-1).
 
 #### Linux Users
 
