@@ -12,7 +12,7 @@ This section is to help you guys get out from frustration of setting up Protobuf
 
 #### Windows Users
 
-Good news for Windows users, there is already a binary release for Windows. You can find it in [https://github.com/google/protobuf/releases](https://github.com/google/protobuf/releases). Remember to grab the v3.0.0 (mine was v3.0.0-beta-1).
+Good news for Windows users, there is already a binary release for Windows. You can find it in [https://github.com/google/protobuf/releases](https://github.com/google/protobuf/releases). Remember to grab the v3.0.0 (mine was v3.0.0-alpha-2).
 
 #### Linux Users
 
